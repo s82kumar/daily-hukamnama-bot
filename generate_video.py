@@ -1,8 +1,8 @@
 import os
-import asyncio
 import requests
-import edge_tts
+import soundfile as sf
 from google import genai
+from kokoro_onnx import Kokoro
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, vfx
 
 # 1. Fetch Today's Hukamnama from BaniDB
@@ -23,15 +23,15 @@ narration = client.models.generate_content(
     model="gemini-3.8-flash", contents=prompt
 ).text.strip()
 
-# 3. Generate Free Neural Voiceover using Edge-TTS
-async def make_audio():
-    communicate = edge_tts.Communicate(narration, "en-US-AndrewNeural", rate="-10%")
-    await communicate.save("voice.mp3")
-
-asyncio.run(make_audio())
+# 3. Generate the narration locally with Kokoro
+kokoro = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
+samples, sample_rate = kokoro.create(
+    narration, voice="am_michael", speed=0.9, lang="en-us"
+)
+sf.write("voice.wav", samples, sample_rate)
 
 # 4. Render 9:16 Vertical Video with Automatic Looping
-audio = AudioFileClip("voice.mp3")
+audio = AudioFileClip("voice.wav")
 video = VideoFileClip("bg.mp4").fx(vfx.loop, duration=audio.duration + 1).set_audio(audio)
 
 gurmukhi_clip = TextClip(
