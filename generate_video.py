@@ -20,7 +20,7 @@ prompt = (
     f"respectful 45-second narration script for TikTok. Do not add hashtags or emojis:\n\n{english_full}"
 )
 narration = client.models.generate_content(
-    model="gemini-2.5-flash", contents=prompt
+    model="gemini-3.8-flash", contents=prompt
 ).text.strip()
 
 # 3. Generate Free Neural Voiceover using Edge-TTS
