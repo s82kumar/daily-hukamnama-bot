@@ -1,6 +1,7 @@
 import os
 import requests
 import soundfile as sf
+from gtts import gTTS
 from google import genai
 from kokoro_onnx import Kokoro
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, vfx
@@ -24,14 +25,20 @@ narration = client.models.generate_content(
 ).text.strip()
 
 # 3. Generate the narration locally with Kokoro
-kokoro = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
-samples, sample_rate = kokoro.create(
-    narration, voice="am_michael", speed=0.92, lang="en-us"
-)
-sf.write("voice.wav", samples, sample_rate)
+audio_path = "voice.wav"
+try:
+    kokoro = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
+    samples, sample_rate = kokoro.create(
+        narration, voice="am_michael", speed=0.92, lang="en-us"
+    )
+    sf.write(audio_path, samples, sample_rate)
+except Exception as error:
+    print(f"Kokoro TTS failed with {type(error).__name__}; using gTTS fallback.")
+    audio_path = "voice.mp3"
+    gTTS(text=narration, lang="en", slow=False).save(audio_path)
 
 # 4. Render 9:16 Vertical Video with Automatic Looping
-audio = AudioFileClip("voice.wav")
+audio = AudioFileClip(audio_path)
 video = VideoFileClip("bg.mp4").fx(vfx.loop, duration=audio.duration + 1).set_audio(audio)
 
 gurmukhi_clip = TextClip(

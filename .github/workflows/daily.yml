@@ -23,7 +23,7 @@ jobs:
           if [ -n "$policy_file" ]; then
             sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' "$policy_file"
           fi
-          pip install requests google-genai moviepy==1.0.3 kokoro-onnx soundfile
+          pip install requests google-genai moviepy==1.0.3 kokoro-onnx soundfile gTTS
           curl -fL --retry 3 --retry-delay 2 -o kokoro-v1.0.onnx https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.0.onnx
           curl -fL --retry 3 --retry-delay 2 -o voices-v1.0.bin https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/voices-v1.0.bin
 
