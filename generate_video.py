@@ -6,11 +6,12 @@ from google import genai
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, vfx
 
 # 1. Fetch Today's Hukamnama from BaniDB
-response = requests.get("https://banidb.com").json()
-verses = response["hukamnama"]
+response = requests.get("https://api.gurbaninow.com/v2/hukamnama/today", timeout=30)
+response.raise_for_status()
+verses = response.json()["hukamnama"]
 
-gurmukhi_text = "\n".join([v["verse"]["verse"]["unicode"] for v in verses[:4]])
-english_full = " ".join([v["verse"]["translation"]["en"]["bdb"] for v in verses])
+gurmukhi_text = "\n".join([v["line"]["gurmukhi"]["unicode"] for v in verses[:4]])
+english_full = " ".join([v["line"]["translation"]["english"]["default"] for v in verses])
 
 # 2. Summarize Reflection with Free Gemini API
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
