@@ -19,9 +19,10 @@ jobs:
       - name: Install ImageMagick & Dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y imagemagick ffmpeg
-          policy_file=$(find /etc -path '*/ImageMagick-*/policy.xml' -print -quit)
-          if [ -z "$policy_file" ]; then echo "ImageMagick policy.xml not found" >&2; exit 1; fi
-          sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' "$policy_file"
+          policy_file=$(find /etc /usr/lib /usr/share -type f -name policy.xml -path '*ImageMagick*' -print -quit 2>/dev/null || true)
+          if [ -n "$policy_file" ]; then
+            sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' "$policy_file"
+          fi
           pip install requests edge-tts google-genai moviepy==1.0.3
 
       - name: Run Hukamnama Agent
