@@ -26,7 +26,7 @@ narration = client.models.generate_content(
 # 3. Generate the narration locally with Kokoro
 kokoro = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
 samples, sample_rate = kokoro.create(
-    narration, voice="am_michael", speed=0.9, lang="en-us"
+    narration, voice="am_michael", speed=0.92, lang="en-us"
 )
 sf.write("voice.wav", samples, sample_rate)
 
